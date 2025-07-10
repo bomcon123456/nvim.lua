@@ -1,0 +1,26 @@
+{
+  "Generate config": {
+    "prefix": ["rsync", "rsync-conf"],
+    "body": [
+      "# filename: _rsync.yaml",
+      "src_dir: \"${1:.}\" # local directory",
+      "target_dir: ${2} # remote directory",
+      "target_dirs:",
+      "  - \"\"",
+      "only_exts:",
+      " - \"**.py\"",
+      " - \"**.sh\"",
+      " - \"*.gitignore\"",
+      " - \"*/\"",
+      "enable_filter_by_path: \"false\" # load filter_by_path",
+      "filter_path: \"_rfilter.txt\" # path to a txt file using in rsync --exclude-from",
+
+      "filter_images: \"true\" # filter all image ext",
+      "filter_tmp: \"true\" # filter all tmp related",
+      "filter_default: true # filter a bunch of non neccessary files",
+      "sync_all: false # if true, sync all",
+      "rsync_cmd: \"rsyncp\" # if true, sync all"
+    ],
+    "description": "RsyncConf: Generate new config file"
+  }
+}

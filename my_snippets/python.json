@@ -1,0 +1,18 @@
+{
+  "Typer CLI": {
+    "prefix": "typercli",
+    "body": [
+      "import typer",
+      "from pathlib import Path",
+      "",
+      "app = typer.Typer()",
+      "@app.command()",
+      "def main(\n    indir: Path = typer.Argument(..., help=\"Input dir\"),\n    outdir: Path = typer.Argument(..., help=\"Output dir\"),\n):",
+      "    pass",
+      "",
+      "if __name__ == \"__main__\":",
+      "    app()"
+    ],
+    "description": "CLI boilerplate for typer"
+  }
+}
