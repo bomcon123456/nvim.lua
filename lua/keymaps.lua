@@ -63,6 +63,8 @@ map('n', '<C-d>', '<C-d>zz', { desc = 'Move half-up' })
 map('n', '<C-u>', '<C-u>zz', { desc = 'Move half-down' })
 map('n', 'n', 'nzzzv', { desc = 'Next find' })
 map('n', 'N', 'Nzzzv', { desc = 'Prev find' })
+map('v', '<', '<gv', { desc = 'Indent left and reselect' })
+map('v', '>', '>gv', { desc = 'Indent right and reselect' })
 
 -- UI
 map('n', '<leader>un', '<cmd>Telescope notify<CR>', { desc = 'RsyncRepo: Upload' })
