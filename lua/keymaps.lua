@@ -68,8 +68,6 @@ map('n', 'N', 'Nzzzv', { desc = 'Prev find' })
 map('n', '<leader>un', '<cmd>Telescope notify<CR>', { desc = 'RsyncRepo: Upload' })
 
 -- utils
-map('n', '<leader>ru', '<cmd>!~/scripts/rsync_repo.py upload<CR>', { desc = 'RsyncRepo: Upload' })
-map('n', '<leader>rd', '<cmd>!~/scripts/rsync_repo.py download<CR>', { desc = 'RsyncRepo: Download' })
 map('n', '<C-k>', '<cmd>cnext<CR>zz', { desc = 'Next in quick fix' })
 map('n', '<C-j>', '<cmd>cprev<CR>zz', { desc = 'Prev in quick fix' })
 map('n', '<leader>k', '<cmd>lnext<CR>zz', { desc = 'Next in location' })
@@ -114,3 +112,89 @@ vim.api.nvim_create_user_command('ResetCwdToOriginal', reset_cwd_to_original, {}
 -- Key mappings
 map('n', '<leader>bs', ':SetCwdToLspRoot<CR>', { desc = 'Set CWD to LSP root' })
 map('n', '<leader>bS', ':ResetCwdToOriginal<CR>', { desc = 'Reset CWD to original' })
+local log_path = vim.fn.stdpath 'cache' .. '/rsync_repo.log'
+
+-- Helper: Run the command, write to log file, show notification
+local function run_rsync_command(command, label)
+  -- Reset to original directory
+  vim.cmd 'ResetCwdToOriginal'
+
+  -- Run the command and capture output
+  local output = vim.fn.systemlist(command .. ' 2>&1')
+
+  -- Save full output to log file
+  vim.fn.writefile(output, log_path)
+
+  -- Show last few lines in a notification
+  local num_lines = #output
+  local preview_lines = {}
+  for i = math.max(1, num_lines - 5), num_lines do
+    table.insert(preview_lines, output[i])
+  end
+  local message = label .. ' complete.\nLast lines:\n' .. table.concat(preview_lines, '\n')
+  vim.notify(message, vim.log.levels.INFO, { title = 'RsyncRepo' })
+end
+
+-- Upload map
+map('n', '<leader>ru', function()
+  run_rsync_command('~/scripts/rsync_repo.py upload', 'Upload')
+end, { desc = 'RsyncRepo: Upload' })
+
+-- Download map
+map('n', '<leader>rd', function()
+  run_rsync_command('~/scripts/rsync_repo.py download', 'Download')
+end, { desc = 'RsyncRepo: Download' })
+
+-- Store the buffer number for the log file
+local log_buffer = nil
+
+-- View log file in buffer (toggle)
+map('n', '<leader>rl', function()
+  -- Check if buffer exists and is valid
+  if log_buffer and vim.api.nvim_buf_is_valid(log_buffer) then
+    -- Check if buffer is currently visible in any window
+    local wins = vim.api.nvim_list_wins()
+    local buffer_visible = false
+    local win_with_buffer = nil
+
+    for _, win in ipairs(wins) do
+      if vim.api.nvim_win_get_buf(win) == log_buffer then
+        buffer_visible = true
+        win_with_buffer = win
+        break
+      end
+    end
+
+    if buffer_visible then
+      -- Buffer is visible, close the window
+      vim.api.nvim_win_close(win_with_buffer, false)
+    else
+      -- Buffer exists but not visible, show it in a new window
+      vim.cmd 'new'
+      vim.api.nvim_win_set_buf(0, log_buffer)
+      vim.cmd 'normal! gg'
+    end
+  else
+    -- Buffer doesn't exist, create it
+    local lines = vim.fn.readfile(log_path)
+    vim.cmd 'new'
+    log_buffer = vim.api.nvim_get_current_buf()
+
+    vim.api.nvim_buf_set_lines(log_buffer, 0, -1, false, lines)
+    vim.bo[log_buffer].buftype = 'nofile'
+    vim.bo[log_buffer].bufhidden = 'wipe'
+    vim.bo[log_buffer].swapfile = false
+    vim.bo[log_buffer].readonly = true
+    vim.bo[log_buffer].filetype = 'log'
+    vim.cmd 'normal! gg'
+
+    -- Clear the buffer variable when the buffer is wiped
+    vim.api.nvim_create_autocmd('BufWipeout', {
+      buffer = log_buffer,
+      callback = function()
+        log_buffer = nil
+      end,
+      once = true,
+    })
+  end
+end, { desc = 'Toggle RsyncRepo Log' })
