@@ -7,6 +7,10 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
 
+-- disable netrw
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 if os.getenv 'SSH_TTY' then
   -- Configure Neovim to use OSC 52 for clipboard operations during SSH sessions
   vim.g.clipboard = {

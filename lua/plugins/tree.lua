@@ -31,10 +31,16 @@ return {
   {
     {
       'stevearc/oil.nvim',
+      lazy = false,
       keys = {
         { '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' } },
       },
-      opts = {},
+      opts = {
+        default_file_explorer = true,
+        view_options = {
+          show_hidden = true,
+        },
+      },
       -- Optional dependencies
       dependencies = { 'nvim-tree/nvim-web-devicons' },
     },

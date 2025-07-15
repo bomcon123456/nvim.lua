@@ -145,6 +145,10 @@ map('n', '<leader>rd', function()
   run_rsync_command('~/scripts/rsync_repo.py download', 'Download')
 end, { desc = 'RsyncRepo: Download' })
 
+map('n', '<leader>tH', function()
+  require('oil').toggle_hidden()
+end, { desc = 'Format: [T]oggle [H]idden in oil' })
+
 -- Store the buffer number for the log file
 local log_buffer = nil
 
