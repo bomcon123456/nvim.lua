@@ -124,10 +124,13 @@ return {
         enabled = true,
         sources = {
           explorer = {
-            -- hidden = true,
             layout = { layout = { position = 'right' } },
           },
+          grep = {
+            hidden = true,
+          },
         },
+        hidden = true,
         preset = 'ivy',
       },
       quickfile = { enabled = true },
