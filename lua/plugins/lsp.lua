@@ -338,7 +338,7 @@ return {
         'json-lsp',
         'jsonls',
         'lua_ls',
-        'luacheck',
+        -- 'luacheck',
         'markdown-toc',
         'markdownlint',
         'markdownlint-cli2',
