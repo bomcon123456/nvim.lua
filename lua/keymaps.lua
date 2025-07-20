@@ -38,6 +38,30 @@ end
 -- vim.keymap.set('n', '<Right>', function()
 --   require('origami').l()
 -- end)
+map('n', '[d', function()
+  vim.diagnostic.goto_prev {
+    severity = vim.diagnostic.severity.WARN,
+    wrap = true,
+  }
+end, { desc = 'Previous warning diagnostic in buffer' })
+map('n', ']d', function()
+  vim.diagnostic.goto_next {
+    severity = vim.diagnostic.severity.WARN,
+    wrap = true,
+  }
+end, { desc = 'Next warning diagnostic in buffer' })
+map('n', '[D', function()
+  vim.diagnostic.goto_prev {
+    severity = vim.diagnostic.severity.ERROR,
+    wrap = true,
+  }
+end, { desc = 'Previous error diagnostic in buffer' })
+map('n', ']D', function()
+  vim.diagnostic.goto_next {
+    severity = vim.diagnostic.severity.ERROR,
+    wrap = true,
+  }
+end, { desc = 'Next error diagnostic in buffer' })
 
 -- map("n", "<leader>e", vim.cmd.Ex, { desc = "Open ex" })
 map('n', '<leader>rw', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = '[R]eplace [w]ord on cursor' })

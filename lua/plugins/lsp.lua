@@ -106,6 +106,17 @@ return {
           --  Similar to document symbols, except searches over your entire project.
           map('gW', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
 
+          -- Show diagnostics for current line only
+          map('<leader>cd', function()
+            vim.diagnostic.open_float {
+              scope = 'line',
+              border = 'rounded',
+              source = 'if_many',
+              header = '',
+              prefix = '',
+            }
+          end, '[C]urrent line [D]iagnostics')
+
           -- Jump to the type of the word under your cursor.
           --  Useful when you're not sure what type a variable is and you want to see
           --  the definition of its *type*, not where it was *defined*.
@@ -170,6 +181,7 @@ return {
       vim.diagnostic.config {
         severity_sort = true,
         underline = false,
+        update_in_insert = false,
         -- underline = { severity = vim.diagnostic.severity.ERROR },
         float = { border = 'rounded', source = 'if_many' },
         signs = vim.g.have_nerd_font and {
@@ -201,6 +213,55 @@ return {
       --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
       --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
       local capabilities = require('blink.cmp').get_lsp_capabilities()
+
+      -- Enable semantic tokens capability for unused variable highlighting
+      capabilities.textDocument.semanticTokens = {
+        dynamicRegistration = false,
+        tokenTypes = {
+          'namespace',
+          'type',
+          'class',
+          'enum',
+          'interface',
+          'struct',
+          'typeParameter',
+          'parameter',
+          'variable',
+          'property',
+          'enumMember',
+          'event',
+          'function',
+          'method',
+          'macro',
+          'keyword',
+          'modifier',
+          'comment',
+          'string',
+          'number',
+          'regexp',
+          'operator',
+        },
+        tokenModifiers = {
+          'declaration',
+          'definition',
+          'readonly',
+          'static',
+          'deprecated',
+          'abstract',
+          'async',
+          'modification',
+          'documentation',
+          'defaultLibrary',
+          'unused',
+        },
+        formats = { 'relative' },
+        requests = {
+          range = true,
+          full = {
+            delta = true,
+          },
+        },
+      }
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -431,8 +492,8 @@ return {
           return nil
         else
           return {
-            timeout_ms = 500,
-            lsp_format = 'fallback',
+            timeout_ms = 2000,
+            -- lsp_format = 'fallback',
           }
         end
       end,
