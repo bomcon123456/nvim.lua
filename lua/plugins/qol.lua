@@ -1,4 +1,5 @@
 return {
+  { 'mrjones2014/smart-splits.nvim' },
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
   { -- Useful plugin to show you pending keybinds.
@@ -110,6 +111,13 @@ return {
     lazy = false,
     ---@type snacks.Config
     opts = {
+      terminal = {
+        win = {
+          wo = {
+            winbar = '',
+          },
+        },
+      },
       indent = {
         enabled = false,
       },
@@ -561,17 +569,23 @@ return {
       {
         '<c-/>',
         function()
-          Snacks.terminal()
+          Snacks.terminal.toggle()
         end,
+        mode = { 'n', 't' },
         desc = 'Toggle Terminal',
       },
       {
-        '<c-_>',
+        '<m-j>',
         function()
-          Snacks.terminal()
+          Snacks.terminal.toggle()
         end,
-        desc = 'which_key_ignore',
+        mode = { 'n', 't' },
+        desc = 'Toggle Terminal',
       },
+      { '<c-h>', [[<C-\><C-n><C-W>h]], mode = 't', desc = 'Window Movement: Move Left' },
+      { '<c-j>', [[<C-\><C-n><C-W>j]], mode = 't', desc = 'Window Movement: Move Down' },
+      { '<c-k>', [[<C-\><C-n><C-W>k]], mode = 't', desc = 'Window Movement: Move Up' },
+      { '<c-l>', [[<C-\><C-n><C-W>l]], mode = 't', desc = 'Window Movement: Move Right' },
       {
         ']]',
         function()
