@@ -212,155 +212,142 @@ return {
       --  By default, Neovim doesn't support everything that is in the LSP specification.
       --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
       --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
-      local capabilities = require('blink.cmp').get_lsp_capabilities()
+      -- NOTE: The following line is now commented as blink.cmp extends capabilites by default from its internal code:
+      -- https://github.com/Saghen/blink.cmp/blob/102db2f5996a46818661845cf283484870b60450/plugin/blink-cmp.lua
+      -- It has been left here as a comment for educational purposes (as the predecessor completion plugin required this explicit step).
+      -- local capabilities = require('blink.cmp').get_lsp_capabilities()
 
-      -- Enable semantic tokens capability for unused variable highlighting
-      capabilities.textDocument.semanticTokens = {
-        dynamicRegistration = false,
-        tokenTypes = {
-          'namespace',
-          'type',
-          'class',
-          'enum',
-          'interface',
-          'struct',
-          'typeParameter',
-          'parameter',
-          'variable',
-          'property',
-          'enumMember',
-          'event',
-          'function',
-          'method',
-          'macro',
-          'keyword',
-          'modifier',
-          'comment',
-          'string',
-          'number',
-          'regexp',
-          'operator',
-        },
-        tokenModifiers = {
-          'declaration',
-          'definition',
-          'readonly',
-          'static',
-          'deprecated',
-          'abstract',
-          'async',
-          'modification',
-          'documentation',
-          'defaultLibrary',
-          'unused',
-        },
-        formats = { 'relative' },
-        requests = {
-          range = true,
-          full = {
-            delta = true,
-          },
-        },
-      }
+      -- Language servers can broadly be installed in the following ways:
+      --  1) via the mason package manager; or
+      --  2) via your system's package manager; or
+      --  3) via a release binary from a language server's repo that's accessible somewhere on your system.
 
-      -- Enable the following language servers
-      --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
-      --
-      --  Add any additional override configuration in the following tables. Available keys are:
-      --  - cmd (table): Override the default command used to start the server
-      --  - filetypes (table): Override the default list of associated filetypes for the server
-      --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
-      --  - settings (table): Override the default settings passed when initializing the server.
-      --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+      -- The servers table comprises of the following sub-tables:
+      -- 1. mason
+      -- 2. others
+      -- Both these tables have an identical structure of language server names as keys and
+      -- a table of language server configuration as values.
+      ---@class LspServersConfig
+      ---@field mason table<string, vim.lsp.Config>
+      ---@field others table<string, vim.lsp.Config>
       local servers = {
-        -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-        clangd = {
-          filetypes = {
-            'c',
-            'cpp',
-            'objc',
-            'objcpp',
-            'cuda',
-          },
-          cmd = {
-            'clangd',
-            '--background-index',
-            '--offset-encoding=utf-16',
-            '--clang-tidy',
-            '--header-insertion=iwyu',
-            '--completion-style=detailed',
-            '--function-arg-placeholders',
-            '--fallback-style=llvm',
-            -- '--query-driver=/usr/local/cuda/bin/nvcc',
-            -- '--query-driver=/usr/bin/c++',
-          },
-          init_options = {
-            usePlaceholders = true,
-            completeUnimported = true,
-            clangdFileStatus = true,
-          },
-        },
-
-        basedpyright = {
-          disableOrganizeImports = true,
-          typeCheckingMode = 'off',
-          analysis = {
-            diagnosticMode = 'openFilesOnly',
-            diagnosticSeverityOverrides = {
-              reportUnusedImport = 'none',
+        mason = {
+          --  Add any additional override configuration in any of the following tables. Available keys are:
+          --  - cmd (table): Override the default command used to start the server
+          --  - filetypes (table): Override the default list of associated filetypes for the server
+          --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
+          --  - settings (table): Override the default settings passed when initializing the server.
+          --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+          --  Feel free to add/remove any LSPs here that you want to install via Mason. They will automatically be installed and setup.
+          clangd = {
+            filetypes = {
+              'c',
+              'cpp',
+              'objc',
+              'objcpp',
+              'cuda',
             },
-            inlayHints = {
-              callArgumentNames = true,
+            cmd = {
+              'clangd',
+              '--background-index',
+              '--offset-encoding=utf-16',
+              '--clang-tidy',
+              '--header-insertion=iwyu',
+              '--completion-style=detailed',
+              '--function-arg-placeholders',
+              '--fallback-style=llvm',
+              -- '--query-driver=/usr/local/cuda/bin/nvcc',
+              -- '--query-driver=/usr/bin/c++',
             },
-            disable = { 'reportUnusedImport' },
+            init_options = {
+              usePlaceholders = true,
+              completeUnimported = true,
+              clangdFileStatus = true,
+            },
           },
-        },
-        ruff = {
-          cmd_env = { RUFF_TRACE = 'messages' },
-          init_options = {
+          ruff = {
+            cmd_env = { RUFF_TRACE = 'messages' },
+            init_options = {
+              settings = {
+                logLevel = 'error',
+              },
+            },
+          },
+          basedpyright = {
             settings = {
-              logLevel = 'error',
-            },
-          },
-          -- keys = {
-          --   {
-          --     "<leader>co",
-          --     LazyVim.lsp.action["source.organizeImports"],
-          --     desc = "Organize Imports",
-          --   },
-          -- },
-        },
-
-        lua_ls = {
-          settings = {
-            Lua = {
-              format = {
-                enable = true,
-                indent_style = 'space',
-                indent_size = '4',
-                defaultConfig = {
-                  indent_style = 'space',
-                  indent_size = '4',
+              basedpyright = {
+                disableOrganizeImports = true,
+                typeCheckingMode = 'off',
+                analysis = {
+                  autoSearchPaths = false,
+                  diagnosticMode = 'openFilesOnly',
+                  diagnosticSeverityOverrides = {
+                    -- reportUnusedImport = 'none',
+                    reportAttributeAccessIssue = 'warning',
+                    reportOptionalMemberAccess = 'none',
+                    reportUnusedVariable = 'none',
+                    reportUnusedCallResult = 'none',
+                    reportUnusedExpression = 'none',
+                    reportUnknownMemberType = 'none',
+                    reportUnknownLambdaType = 'none',
+                    reportUnknownParameterType = 'none',
+                    reportUnknownVariableTypeType = 'none',
+                    reportMissingParameterType = 'none',
+                    reportMissingTypeStub = 'information',
+                    reportUnknownVariableType = 'none',
+                    reportUnknownArgumentType = 'none',
+                    reportImplicitOverride = 'none',
+                    reportAny = 'none',
+                  },
+                  inlayHints = {
+                    callArgumentNames = true,
+                  },
+                  semanticTokens = true,
+                  disable = { 'reportUnusedImport' },
                 },
               },
-              workspace = { checkThirdParty = false },
-              telemetry = { enable = false },
-              diagnostics = {
-                -- Get the language server to recognize the `vim` global
-                globals = { 'vim' },
+              python = {
+                analysis = {
+                  -- Ignore all files for analysis to exclusively use Ruff for linting
+                  ignore = { '*' },
+                },
+              },
+            },
+          },
+          lua_ls = {
+            settings = {
+              Lua = {
+                format = {
+                  enable = true,
+                  indent_style = 'space',
+                  indent_size = '4',
+                  defaultConfig = {
+                    indent_style = 'space',
+                    indent_size = '4',
+                  },
+                },
+                workspace = { checkThirdParty = false },
+                telemetry = { enable = false },
+                diagnostics = {
+                  -- Get the language server to recognize the `vim` global
+                  globals = { 'vim' },
+                },
+              },
+            },
+          },
+          cmake = {
+            root_dir = util.root_pattern('build', 'build_x64_linux', 'build_aarch64_linux'),
+            settings = {
+              cmake = {
+                format = {
+                  enable = true, -- Enables formatting
+                },
               },
             },
           },
         },
-        cmake = {
-          root_dir = util.root_pattern('build', 'build_x64_linux', 'build_aarch64_linux'),
-          settings = {
-            cmake = {
-              format = {
-                enable = true, -- Enables formatting
-              },
-            },
-          },
+        others = {
+          -- dartls = {},
         },
       }
 
@@ -377,48 +364,24 @@ return {
       --
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
-      local ensure_installed = vim.tbl_keys(servers or {})
+      local ensure_installed = vim.tbl_keys(servers.mason or {})
       vim.list_extend(ensure_installed, {
-        'stylua', -- Used to format Lua code
-        'autoflake',
-        'basedpyright',
         'bashls',
         'black',
-        'clang-format',
-        'clangd',
-        'cmake',
-        'cmakelang',
-        'cmakelint',
-        'debugpy',
-        'eslint-lsp',
-        'eslint',
-        'flake8',
         'isort',
         'jq',
-        'js-debug-adapter',
         'json-lsp',
         'jsonls',
-        'lua_ls',
-        -- 'luacheck',
         'markdown-toc',
         'markdownlint',
         'markdownlint-cli2',
         'marksman',
-        'mypy',
         'prettier',
         'prettierd',
         'ruff',
-        'rust-analyzer',
-        'rustywind',
         'shellcheck',
         'shfmt',
-        'sql-formatter',
-        'sqlfmt',
-        'sqlls',
         'stylua',
-        'taplo',
-        'ts_ls',
-        'vtsls',
         'yamlls',
         'yamlfix',
         'yamlfmt',
@@ -426,19 +389,19 @@ return {
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+      -- Either merge all additional server configs from the `servers.mason` and `servers.others` tables
+      -- to the default language server configs as provided by nvim-lspconfig or
+      -- define a custom server config that's unavailable on nvim-lspconfig.
+      for server, config in pairs(vim.tbl_extend('keep', servers.mason, servers.others)) do
+        if not vim.tbl_isempty(config) then
+          vim.lsp.config(server, config)
+        end
+      end
+
+      -- After configuring our language servers, we now enable them
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
-        automatic_installation = false,
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for ts_ls)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
+        automatic_enable = true, -- automatically run vim.lsp.enable() for all servers that are installed via Mason
       }
     end,
   },
