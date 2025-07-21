@@ -196,6 +196,8 @@ return {
         virtual_text = {
           source = 'if_many',
           spacing = 2,
+          prefix = '●',
+          severity = { min = vim.diagnostic.severity.WARN },
           format = function(diagnostic)
             local diagnostic_message = {
               [vim.diagnostic.severity.ERROR] = diagnostic.message,
@@ -265,14 +267,6 @@ return {
               clangdFileStatus = true,
             },
           },
-          ruff = {
-            cmd_env = { RUFF_TRACE = 'messages' },
-            init_options = {
-              settings = {
-                logLevel = 'error',
-              },
-            },
-          },
           basedpyright = {
             settings = {
               basedpyright = {
@@ -282,7 +276,6 @@ return {
                   autoSearchPaths = false,
                   diagnosticMode = 'openFilesOnly',
                   diagnosticSeverityOverrides = {
-                    -- reportUnusedImport = 'none',
                     reportAttributeAccessIssue = 'none',
                     reportOptionalMemberAccess = 'none',
                     reportUnusedVariable = 'none',
@@ -300,19 +293,13 @@ return {
                     reportUndefinedVariable = 'warning',
                     reportMissingImports = 'error',
                     reportGeneralTypeIssues = 'error',
+                    reportCallIssue = 'none',
                     reportAny = 'none',
                   },
                   inlayHints = {
                     callArgumentNames = true,
                   },
                   semanticTokens = true,
-                  disable = { 'reportUnusedImport' },
-                },
-              },
-              python = {
-                analysis = {
-                  -- Ignore all files for analysis to exclusively use Ruff for linting
-                  ignore = { '*' },
                 },
               },
             },
