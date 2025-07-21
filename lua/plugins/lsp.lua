@@ -283,7 +283,7 @@ return {
                   diagnosticMode = 'openFilesOnly',
                   diagnosticSeverityOverrides = {
                     -- reportUnusedImport = 'none',
-                    reportAttributeAccessIssue = 'warning',
+                    reportAttributeAccessIssue = 'none',
                     reportOptionalMemberAccess = 'none',
                     reportUnusedVariable = 'none',
                     reportUnusedCallResult = 'none',
@@ -297,6 +297,9 @@ return {
                     reportUnknownVariableType = 'none',
                     reportUnknownArgumentType = 'none',
                     reportImplicitOverride = 'none',
+                    reportUndefinedVariable = 'warning',
+                    reportMissingImports = 'error',
+                    reportGeneralTypeIssues = 'error',
                     reportAny = 'none',
                   },
                   inlayHints = {
@@ -378,7 +381,6 @@ return {
         'marksman',
         'prettier',
         'prettierd',
-        'ruff',
         'shellcheck',
         'shfmt',
         'stylua',

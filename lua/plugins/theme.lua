@@ -1,7 +1,18 @@
 return {
   {
+    'catppuccin/nvim',
+    name = 'catppuccin',
+    -- init = function()
+    --   vim.cmd.colorscheme 'catppuccin'
+    -- end,
+    priority = 1000,
+  },
+  {
     'rebelot/kanagawa.nvim',
     lazy = false,
+    init = function()
+      vim.cmd.colorscheme 'kanagawa'
+    end,
     -- color the window separator hot pink
     config = function()
       require('kanagawa').setup {
@@ -49,7 +60,6 @@ return {
           }
         end,
       }
-      vim.cmd.colorscheme 'kanagawa'
     end,
   },
 }
