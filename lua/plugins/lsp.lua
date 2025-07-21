@@ -267,6 +267,7 @@ return {
               clangdFileStatus = true,
             },
           },
+          ---@type lspconfig.options.basedpyright
           basedpyright = {
             settings = {
               basedpyright = {
