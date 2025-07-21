@@ -2,32 +2,25 @@
 -- https://github.com/nvim-neo-tree/neo-tree.nvim
 
 return {
-  -- {
-  --   'nvim-neo-tree/neo-tree.nvim',
-  --   version = '*',
-  --   dependencies = {
-  --     'nvim-lua/plenary.nvim',
-  --     'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
-  --     'MunifTanjim/nui.nvim',
-  --   },
-  --   lazy = false,
-  --   keys = {
-  --     { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
-  --   },
-  --   opts = {
-  --     clost_if_last_window = true,
-  --     filesystem = {
-  --       window = {
-  --         position = 'right',
-  --         mappings = {
-  --           ['\\'] = 'close_window',
-  --         },
-  --       },
-  --       hijack_netrw_behavior = 'open_default',
-  --       group_empty_dirs = true,
-  --     },
-  --   },
-  -- },
+  {
+    'echasnovski/mini.files',
+    config = function()
+      local MiniFiles = require 'mini.files'
+      MiniFiles.setup {
+        mappings = {
+          go_in = '<CR>', -- Map both Enter and L to enter directories or open files
+          go_in_plus = 'L',
+          go_out = '-',
+          go_out_plus = 'H',
+        },
+      }
+      vim.keymap.set('n', '<leader>ee', '<cmd>lua MiniFiles.open()<CR>', { desc = 'Toggle mini file explorer' }) -- toggle file explorer
+      vim.keymap.set('n', '<leader>ef', function()
+        MiniFiles.open(vim.api.nvim_buf_get_name(0), false)
+        MiniFiles.reveal_cwd()
+      end, { desc = 'Toggle into currently opened file' })
+    end,
+  },
   {
     {
       'stevearc/oil.nvim',
