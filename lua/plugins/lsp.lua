@@ -74,6 +74,21 @@ return {
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
 
+          -- Additional on_attach logic
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client.name == 'basedpyright' then
+            client.server_capabilities.semanticTokensProvider = nil
+          end
+
+          if client.name == 'ruff' then
+            -- Disable hover in favor of Pyright
+            client.server_capabilities.hoverProvider = false
+
+            -- Disable formatting
+            client.server_capabilities.documentFormattingProvider = false
+            client.server_capabilities.documentRangeFormattingProvider = false
+          end
+
           -- Rename the variable under your cursor.
           --  Most Language Servers support renaming across files, etc.
           map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
@@ -179,35 +194,28 @@ return {
       -- Diagnostic Config
       -- See :help vim.diagnostic.Opts
       vim.diagnostic.config {
-        severity_sort = true,
-        underline = false,
-        update_in_insert = false,
-        -- underline = { severity = vim.diagnostic.severity.ERROR },
-        float = { border = 'rounded', source = 'if_many' },
-        signs = vim.g.have_nerd_font and {
-          text = {
-            [vim.diagnostic.severity.ERROR] = '󰅚 ',
-            [vim.diagnostic.severity.WARN] = '󰀪 ',
-            [vim.diagnostic.severity.INFO] = '󰋽 ',
-            [vim.diagnostic.severity.HINT] = '󰌶 ',
-          },
-        } or {},
-        -- virtual_text = false,
-        virtual_text = {
-          source = 'if_many',
-          spacing = 2,
-          prefix = '●',
-          severity = { min = vim.diagnostic.severity.WARN },
-          format = function(diagnostic)
-            local diagnostic_message = {
-              [vim.diagnostic.severity.ERROR] = diagnostic.message,
-              [vim.diagnostic.severity.WARN] = diagnostic.message,
-              [vim.diagnostic.severity.INFO] = diagnostic.message,
-              [vim.diagnostic.severity.HINT] = diagnostic.message,
-            }
-            return diagnostic_message[diagnostic.severity]
-          end,
+        underline = {
+          severity = false,
         },
+        update_in_insert = false,
+        virtual_text = {
+          severity = { min = vim.diagnostic.severity.WARN },
+          spacing = 4,
+          source = 'if_many',
+          prefix = '●',
+        },
+        severity_sort = true,
+        signs = {
+          text = {
+            [vim.diagnostic.severity.ERROR] = '',
+            [vim.diagnostic.severity.WARN] = '',
+            [vim.diagnostic.severity.HINT] = '',
+            [vim.diagnostic.severity.INFO] = '',
+          },
+        },
+        --     severity = {
+        --         ['unused-local'] = vim.diagnostic.severity.HINT,
+        --     },
       }
 
       -- LSP servers and clients are able to communicate to each other what features they support.
@@ -267,7 +275,20 @@ return {
               clangdFileStatus = true,
             },
           },
-          ---@type lspconfig.options.basedpyright
+          ruff = {
+            settings = {
+              ruff = {
+                lineLength = 100, -- Match Black formatting
+                lint = {
+                  enable = true, -- Enable linting
+                  select = { 'E', 'W', 'F' }, -- Select which rules to use
+                },
+                typeCheck = {
+                  enable = true, -- Enable type checking (like Mypy)
+                },
+              },
+            },
+          },
           basedpyright = {
             settings = {
               basedpyright = {
@@ -279,7 +300,7 @@ return {
                   diagnosticSeverityOverrides = {
                     reportAttributeAccessIssue = 'none',
                     reportOptionalMemberAccess = 'none',
-                    reportUnusedVariable = 'warning',
+                    reportUnusedVariable = 'none',
                     reportUnusedCallResult = 'none',
                     reportUnusedExpression = 'none',
                     reportUnknownMemberType = 'none',
@@ -299,6 +320,12 @@ return {
                   inlayHints = {
                     callArgumentNames = true,
                   },
+                },
+              },
+              python = {
+                analysis = {
+                  -- Ignore all files for analysis to exclusively use Ruff for linting
+                  ignore = { '*' },
                 },
               },
             },
