@@ -10,9 +10,9 @@ return {
   {
     'rebelot/kanagawa.nvim',
     lazy = false,
-    init = function()
-      vim.cmd.colorscheme 'kanagawa'
-    end,
+    -- init = function()
+    --   vim.cmd.colorscheme 'kanagawa'
+    -- end,
     -- color the window separator hot pink
     config = function()
       require('kanagawa').setup {
@@ -61,5 +61,35 @@ return {
         end,
       }
     end,
+  },
+  {
+    'thesimonho/kanagawa-paper.nvim',
+    lazy = false,
+    init = function()
+      vim.cmd.colorscheme 'kanagawa-paper'
+    end,
+    priority = 1000,
+    opts = {
+      -- undercurl = true,
+      transparent = true,
+      gutter = false,
+      dimInactive = false, -- disabled when transparent
+      terminalColors = true,
+      commentStyle = { italic = true },
+      functionStyle = { italic = false, bold = true },
+      keywordStyle = { italic = true, bold = false },
+      statementStyle = { italic = false, bold = false },
+      typeStyle = { italic = false },
+      colors = {
+        theme = {},
+        palette = {
+          roninYellow = '#FFA066',
+          samuraiRed = '#FF5D62',
+        },
+      },
+      overrides = function() -- override highlight groups
+        return {}
+      end,
+    },
   },
 }
