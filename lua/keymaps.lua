@@ -228,3 +228,7 @@ map('n', '<leader>rl', function()
     })
   end
 end, { desc = 'Toggle RsyncRepo Log' })
+
+map('n', '<leader>cp', '<cmd>AerialPrev<CR>', { desc = 'Previous symbol' })
+map('n', '<leader>cn', '<cmd>AerialNext<CR>', { desc = 'Next symbol' })
+map('n', '<leader>to', '<cmd>AerialToggle!<CR>', { desc = '[T]oggle [o]utline' })

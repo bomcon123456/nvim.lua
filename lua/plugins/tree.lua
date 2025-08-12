@@ -83,7 +83,7 @@ return {
     'stevearc/aerial.nvim',
     opts = {
       layout = {
-        default_direction = 'left',
+        default_direction = 'right',
         resize_to_content = false,
         preserve_equality = true,
         max_width = { 40, 0.2 },
