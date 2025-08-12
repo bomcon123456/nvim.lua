@@ -1,3 +1,27 @@
+local grep_directory = function()
+  local snacks = require 'snacks'
+
+  -- Prompt the user for a directory path
+  vim.ui.input({
+    prompt = 'Enter directory path for grep: ',
+    default = vim.fn.getcwd(), -- Optionally, set the current working directory as the default input [1]
+    completion = 'file', -- Enable file path completion for convenience [1]
+  }, function(path)
+    -- The callback function is executed after the user enters input or cancels.
+    -- 'path' will be nil if the user cancels the input dialog [1].
+    if path and path ~= '' then
+      -- If a path is provided, open the snacks grep picker in that directory.
+      -- The 'dirs' option expects a table of paths [7].
+      snacks.picker.grep {
+        dirs = { path },
+      }
+    else
+      -- Notify the user if no path was entered or if they cancelled.
+      vim.notify('No directory path entered. Grep operation cancelled.', vim.log.levels.INFO)
+    end
+  end)
+end
+
 return {
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
@@ -306,6 +330,11 @@ return {
           Snacks.picker.grep()
         end,
         desc = 'Grep',
+      },
+      {
+        '<leader>sG',
+        grep_directory,
+        desc = 'Grep directory',
       },
       -- search
       {
